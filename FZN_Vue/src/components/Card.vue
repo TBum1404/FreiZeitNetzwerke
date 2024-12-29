@@ -38,13 +38,17 @@ export default {
       startX: 0,
       startY: 0,
       isDragging: false, // Verhindert unbeabsichtigtes Swipen
+      popupVisible: false,
     };
   },
   methods: {
     handleOutsideClick(event) {
+
+      if(!this.popupVisible) return;
+
       const card = this.$refs.card;
       const popup = this.$refs.popup;
-      if (popup.style.opacity === '1' && !card.contains(event.target)) {
+      if (popup.style.opacity === '1' && !card.contains(event.target) && !popup.contains(event.target)) {
         popup.style.opacity = '0';
         popup.style.transform = 'translate(-50%, 100%)';
       }
@@ -99,6 +103,9 @@ export default {
       } else if (deltaY < -40) {
         this.showPopup();
         this.resetCard();
+      }else if (deltaY < 10) {
+        this.hidePopup();
+        this.resetCard();
       } else {
         this.resetCard();
       }
@@ -121,6 +128,7 @@ export default {
 
     },
     showPopup() {
+      this.popupVisible = true;
       const popup = this.$refs.popup;
       popup.style.display = 'block';
       setTimeout(() => {
@@ -130,6 +138,7 @@ export default {
 
     },
     hidePopup() {
+      this.popupVisible = false;
       const popup = this.$refs.popup;
       popup.style.transform = 'translate(-50%, 100%)';
       popup.style.opacity = '0';
@@ -140,6 +149,7 @@ export default {
       document.removeEventListener('touchstart', this.closePopup);
     },
     closePopup(e) {
+      this.popupVisible = false;
       const popup = this.$refs.popup;
       if (!popup.contains(e.target)) {
         this.hidePopup();
