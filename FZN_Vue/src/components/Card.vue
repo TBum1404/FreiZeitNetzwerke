@@ -16,8 +16,8 @@
     </div>
 
     <!-- Popup -->
-    <div id="popup" class="popup" v-show="showPopup">
-      Popup: Swipe nach oben hat funktioniert!
+    <div id="popup" class="popup" ref="popup">
+      Popup
     </div>
 
     <!-- Undo-Button -->
@@ -27,15 +27,28 @@
 
 <script>
 export default {
+  mounted() {
+    document.addEventListener('click', this.handleOutsideClick);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleOutsideClick);
+  },
   data() {
     return {
       startX: 0,
       startY: 0,
       isDragging: false, // Verhindert unbeabsichtigtes Swipen
-      showPopup: false, // Popup-Anzeige
     };
   },
   methods: {
+    handleOutsideClick(event) {
+      const card = this.$refs.card;
+      const popup = this.$refs.popup;
+      if (popup.style.opacity === '1' && !card.contains(event.target)) {
+        popup.style.opacity = '0';
+        popup.style.transform = 'translate(-50%, 100%)';
+      }
+    },
     onStart(e) {
       const touch = e.touches[0];
       this.startInteraction(touch.clientX, touch.clientY);
@@ -84,8 +97,8 @@ export default {
       } else if (deltaX < -40) {
         this.swipeCard("left");
       } else if (deltaY < -40) {
+        this.showPopup();
         this.resetCard();
-        this.showPopup = true;
       } else {
         this.resetCard();
       }
@@ -105,7 +118,32 @@ export default {
       const cardElement = this.$refs.card;
       cardElement.style.transform = "translate(0, 0) rotate(0deg)";
       cardElement.style.opacity = "1";
-      this.showPopup = false;
+
+    },
+    showPopup() {
+      const popup = this.$refs.popup;
+      popup.style.display = 'block';
+      setTimeout(() => {
+        popup.style.transform = 'translate(-50%, -50%)';
+        popup.style.opacity = '1';
+      }, 10); // Delay to ensure transition works
+
+    },
+    hidePopup() {
+      const popup = this.$refs.popup;
+      popup.style.transform = 'translate(-50%, 100%)';
+      popup.style.opacity = '0';
+      popup.addEventListener('transitionend', () => {
+        popup.style.display = 'none';
+      }, { once: true });
+      document.removeEventListener('click', this.closePopup);
+      document.removeEventListener('touchstart', this.closePopup);
+    },
+    closePopup(e) {
+      const popup = this.$refs.popup;
+      if (!popup.contains(e.target)) {
+        this.hidePopup();
+      }
     },
   },
 };
@@ -122,10 +160,11 @@ export default {
 
 /* Karten-Stile */
 .card {
+
   position: absolute;
   width: 100%;
   height: 100%;
-  background: #8c8f88;
+  background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -139,23 +178,24 @@ export default {
 
 /* Popup-Stile */
 .popup {
-  position: fixed;
-  bottom: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  overflow: auto;
+  top: 50%;
   left: 50%;
-  transform: translate(-50%, 50%);
-  background-color: purple;
-  color: white;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  transform: translate(-50%, 100%);
+  background-color: rgba(169, 169, 169, 0.909);
+  color: rgb(0, 0, 0);
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.4s ease-in, transform 0.4s ease-in;
-}
-
-.popup[v-show="true"] {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, 0%);
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
 }
 
 /* Undo-Button */
