@@ -10,7 +10,17 @@ import Card from '../components/Card.vue'
   </div> -->
 
   <div class="frame">
-    <Card />
+    
+    
+    <!-- <div class="flex justify-center w-1/2 bg-green-200">
+      
+
+    </div> -->
+    
+    
+    <div class="flex justify-center w-1/2 h-full bg-green-200">
+      <Card />
+    </div>
 
   </div>
 </template>
@@ -24,7 +34,8 @@ import Card from '../components/Card.vue'
   justify-content: center;
   position:relative;
   width: 100%;
+  height: 100%;
   height:auto;
-  background-color: rgb(137, 50, 50);
+  /* background-color: rgb(137, 50, 50); */
 }
 </style>
