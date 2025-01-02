@@ -1,24 +1,17 @@
 <template>
-  <div class="container">
+  <div class="container" @click="handleClick">
     <!-- Eine einzelne Karte -->
     <div
       class="card"
       ref="card"
-      @mousedown="onMouseStart"
-      @mousemove="onMouseMove"
-      @mouseup="onMouseEnd"
-      @mouseleave="onMouseEnd"
-      @touchstart="onStart"
-      @touchmove="onMove"
-      @touchend="onEnd"
+      @mousedown="startDrag"
+      @touchstart="startDrag"
     >
       Karte 1
     </div>
 
-    <!-- Popup -->
-    <div id="popup" class="popup" ref="popup">
-      Popup
-    </div>
+    <!-- Popup-Komponente -->
+    <Popup ref="popup" @click.stop />
 
     <!-- Undo-Button -->
     <button id="undoButton" @click="resetCard">Karte zurücksetzen</button>
@@ -26,135 +19,103 @@
 </template>
 
 <script>
+import Popup from './Popup.vue';
+
 export default {
+  components: {
+    Popup,
+  },
   mounted() {
-    document.addEventListener('click', this.handleOutsideClick);
+    // ...existing code...
   },
   beforeDestroy() {
-    document.removeEventListener('click', this.handleOutsideClick);
+    // ...existing code...
   },
   data() {
     return {
       startX: 0,
       startY: 0,
-      isDragging: false, // Verhindert unbeabsichtigtes Swipen
-      popupVisible: false,
+      currentX: 0,
+      currentY: 0,
+      isDragging: false,
+      hasDragged: false,
+      // ...existing code...
     };
   },
   methods: {
-    handleOutsideClick(event) {
+    // showPopup() {
+    //   this.$refs.popup.$el.style.transform = 'translate(-50%, -50%)';
+    //   this.$refs.popup.$el.style.opacity = '1';
+    // },
 
-      if(!this.popupVisible) return;
+    showPopup() {
+      console.log(this.$refs.popup); // Debugging
+      if (!this.$refs.popup) {
+        console.error("Popup reference not found!");
+        return;
+      }
+      this.$refs.popup.$el.style.transform = 'translate(-50%, -50%)';
+      this.$refs.popup.$el.style.opacity = '1';
+    },
 
-      const card = this.$refs.card;
-      const popup = this.$refs.popup;
-      if (popup.style.opacity === '1' && !card.contains(event.target) && !popup.contains(event.target)) {
-        popup.style.opacity = '0';
-        popup.style.transform = 'translate(-50%, 100%)';
+
+    hidePopup() {
+      this.$refs.popup.$el.style.transform = 'translate(-50%, 100%)';
+      this.$refs.popup.$el.style.opacity = '0';
+    },
+    handleClick(event) {
+      if (!this.$refs.popup.$el.contains(event.target)) {
+        this.hidePopup();
       }
     },
-    onStart(e) {
-      const touch = e.touches[0];
-      this.startInteraction(touch.clientX, touch.clientY);
-    },
-    onMove(e) {
-      if (!this.isDragging) return;
-      const touch = e.touches[0];
-      this.moveCard(touch.clientX, touch.clientY);
-    },
-    onEnd() {
-      if (!this.isDragging) return;
-      this.endInteraction();
-    },
-    onMouseStart(e) {
-      e.preventDefault();
-      this.startInteraction(e.clientX, e.clientY);
-    },
-    onMouseMove(e) {
-      if (!this.isDragging) return;
-      this.moveCard(e.clientX, e.clientY);
-    },
-    onMouseEnd() {
-      if (!this.isDragging) return;
-      this.endInteraction();
-    },
-    startInteraction(x, y) {
-      this.startX = x;
-      this.startY = y;
+    startDrag(event) {
       this.isDragging = true;
+      this.hasDragged = false;
+      this.startX = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
+      this.startY = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
+      document.addEventListener('mousemove', this.onDrag);
+      document.addEventListener('touchmove', this.onDrag);
+      document.addEventListener('mouseup', this.endDrag);
+      document.addEventListener('touchend', this.endDrag);
     },
-    moveCard(currentX, currentY) {
-      const deltaX = currentX - this.startX;
-      const deltaY = currentY - this.startY;
-
-      const cardElement = this.$refs.card;
-      const rotation = deltaX / 10; // Neigung der Karte
-      cardElement.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg)`;
+    onDrag(event) {
+      if (!this.isDragging) return;
+      this.hasDragged = true;
+      this.currentX = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
+      this.currentY = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
+      const deltaX = this.currentX - this.startX;
+      const deltaY = this.currentY - this.startY;
+      const angle = deltaX / 10; // Adjust the divisor to control the angle
+      this.$refs.card.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${angle}deg)`;
     },
-    endInteraction() {
-      const cardElement = this.$refs.card;
-      const deltaX = parseFloat(cardElement.style.transform.split("translate(")[1]?.split("px,")[0] || 0);
-      const deltaY = parseFloat(cardElement.style.transform.split(",")[1]?.split("px)")[0] || 0);
-
-      if (deltaX > 40) {
-        this.swipeCard("right");
-      } else if (deltaX < -40) {
-        this.swipeCard("left");
-      } else if (deltaY < -40) {
+    endDrag() {
+      this.isDragging = false;
+      const deltaX = this.currentX - this.startX;
+      const deltaY = this.currentY - this.startY;
+      if (this.hasDragged && Math.abs(deltaX) > 100) {
+        // Swipe left or right with angle
+        const angle = deltaX / 10; // Adjust the divisor to control the angle
+        this.$refs.card.style.transform = `translate(${deltaX > 0 ? '100%' : '-100%'}, 0) rotate(${angle}deg)`;
+        this.$refs.card.style.opacity = '0';
+      } else if (this.hasDragged && deltaY < -100) {
+        // Swipe up
         this.showPopup();
-        this.resetCard();
-      }else if (deltaY < 10) {
-        this.hidePopup();
+        
         this.resetCard();
       } else {
-        this.resetCard();
+        // Reset position
+        this.$refs.card.style.transform = 'translate(0, 0) rotate(0deg)';
       }
-
-      this.isDragging = false;
-    },
-    swipeCard(direction) {
-      const cardElement = this.$refs.card;
-      if (direction === "right") {
-        cardElement.style.transform = "translateX(500px) rotate(30deg)";
-      } else if (direction === "left") {
-        cardElement.style.transform = "translateX(-500px) rotate(-30deg)";
-      }
-      cardElement.style.opacity = "0";
+      document.removeEventListener('mousemove', this.onDrag);
+      document.removeEventListener('touchmove', this.onDrag);
+      document.removeEventListener('mouseup', this.endDrag);
+      document.removeEventListener('touchend', this.endDrag);
     },
     resetCard() {
-      const cardElement = this.$refs.card;
-      cardElement.style.transform = "translate(0, 0) rotate(0deg)";
-      cardElement.style.opacity = "1";
-
+      this.$refs.card.style.transform = 'translate(0, 0) rotate(0deg)';
+      this.$refs.card.style.opacity = '1';
     },
-    showPopup() {
-      this.popupVisible = true;
-      const popup = this.$refs.popup;
-      popup.style.display = 'block';
-      setTimeout(() => {
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.opacity = '1';
-      }, 10); // Delay to ensure transition works
-
-    },
-    hidePopup() {
-      this.popupVisible = false;
-      const popup = this.$refs.popup;
-      popup.style.transform = 'translate(-50%, 100%)';
-      popup.style.opacity = '0';
-      popup.addEventListener('transitionend', () => {
-        popup.style.display = 'none';
-      }, { once: true });
-      document.removeEventListener('click', this.closePopup);
-      document.removeEventListener('touchstart', this.closePopup);
-    },
-    closePopup(e) {
-      this.popupVisible = false;
-      const popup = this.$refs.popup;
-      if (!popup.contains(e.target)) {
-        this.hidePopup();
-      }
-    },
+    // ...existing code...
   },
 };
 </script>
@@ -163,17 +124,20 @@ export default {
 /* Container-Stile */
 .container {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   width: 300px;
-  height: 400px;
+  height: 500px;
   margin: auto;
 }
 
 /* Karten-Stile */
 .card {
-
+  width: 300px;
+  height: 400px;
   position: absolute;
-  width: 100%;
-  height: 100%;
+  
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -187,26 +151,6 @@ export default {
 }
 
 /* Popup-Stile */
-.popup {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  overflow: auto;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  transform: translate(-50%, 100%);
-  background-color: rgba(169, 169, 169, 0.909);
-  color: rgb(0, 0, 0);
-  padding: 20px;
-  border-radius: 10px;
-  opacity: 0;
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-}
 
 /* Undo-Button */
 #undoButton {
