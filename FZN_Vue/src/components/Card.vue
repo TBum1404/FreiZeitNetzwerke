@@ -11,7 +11,7 @@
     </div>
 
     <!-- Popup-Komponente -->
-    <Popup ref="popup" @click.stop />
+    <Popup ref="popup"  />
 
     <!-- Toggle Popup Button -->
     <button id="togglePopupButton" @click="togglePopup">Toggle Popup</button>
@@ -29,10 +29,10 @@ export default {
     Popup,
   },
   mounted() {
-    // ...existing code...
+    
   },
   beforeDestroy() {
-    // ...existing code...
+   
   },
   data() {
     return {
@@ -43,7 +43,7 @@ export default {
       isDragging: false,
       hasDragged: false,
       isPopupVisible: false,
-      // ...existing code...
+      
     };
   },
   methods: {
@@ -107,7 +107,7 @@ export default {
       const deltaY = this.currentY - this.startY;
       if (this.hasDragged && Math.abs(deltaX) > 100) {
         // Swipe left or right with angle
-        const angle = deltaX / 10; // Adjust the divisor to control the angle
+        const angle = deltaX / 10; 
         this.$refs.card.style.transform = `translate(${deltaX > 0 ? '100%' : '-100%'}, 0) rotate(${angle}deg)`;
         this.$refs.card.style.opacity = '0';
       } else if (this.hasDragged && deltaY < -100) {
@@ -127,7 +127,7 @@ export default {
       this.$refs.card.style.transform = 'translate(0, 0) rotate(0deg)';
       this.$refs.card.style.opacity = '1';
     },
-    // ...existing code...
+    
   },
 };
 </script>

@@ -36,6 +36,7 @@ import Card from '../components/Card.vue'
   width: 100%;
   height: 100%;
   height:auto;
+  overflow: hidden; 
   /* background-color: rgb(137, 50, 50); */
 }
 </style>
