@@ -1,5 +1,5 @@
 <template>
-  <div class="container" @click="handleClick">
+  <div class="container" >
     <!-- Eine einzelne Karte -->
     <div
       class="card"
@@ -12,6 +12,9 @@
 
     <!-- Popup-Komponente -->
     <Popup ref="popup" @click.stop />
+
+    <!-- Toggle Popup Button -->
+    <button id="togglePopupButton" @click="togglePopup">Toggle Popup</button>
 
     <!-- Undo-Button -->
     <button id="undoButton" @click="resetCard">Karte zurücksetzen</button>
@@ -39,29 +42,39 @@ export default {
       currentY: 0,
       isDragging: false,
       hasDragged: false,
+      isPopupVisible: false,
       // ...existing code...
     };
   },
   methods: {
-    // showPopup() {
-    //   this.$refs.popup.$el.style.transform = 'translate(-50%, -50%)';
-    //   this.$refs.popup.$el.style.opacity = '1';
-    // },
-
     showPopup() {
-      console.log(this.$refs.popup); // Debugging
+    if (!this.$refs.popup) {
+      console.error("Popup reference not found!");
+      return;
+    }
+    console.log("Popup reference found:", this.$refs.popup);
+    this.$nextTick(() => {
+      this.$refs.popup.$el.style.transform = 'translate(-50%, -50%)';
+      this.$refs.popup.$el.style.opacity = '1';
+      console.log("Popup styles applied:", this.$refs.popup.$el.style.transform, this.$refs.popup.$el.style.opacity);
+      this.isPopupVisible = true;
+    });
+  },
+    hidePopup() {
       if (!this.$refs.popup) {
         console.error("Popup reference not found!");
         return;
       }
-      this.$refs.popup.$el.style.transform = 'translate(-50%, -50%)';
-      this.$refs.popup.$el.style.opacity = '1';
-    },
-
-
-    hidePopup() {
       this.$refs.popup.$el.style.transform = 'translate(-50%, 100%)';
       this.$refs.popup.$el.style.opacity = '0';
+      this.isPopupVisible = false;
+    },
+    togglePopup() {
+      if (this.isPopupVisible) {
+        this.hidePopup();
+      } else {
+        this.showPopup();
+      }
     },
     handleClick(event) {
       if (!this.$refs.popup.$el.contains(event.target)) {
@@ -100,7 +113,6 @@ export default {
       } else if (this.hasDragged && deltaY < -100) {
         // Swipe up
         this.showPopup();
-        
         this.resetCard();
       } else {
         // Reset position
@@ -151,6 +163,24 @@ export default {
 }
 
 /* Popup-Stile */
+
+/* Toggle Popup Button */
+#togglePopupButton {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#togglePopupButton:hover {
+  background-color: #218838;
+}
 
 /* Undo-Button */
 #undoButton {

@@ -8,6 +8,7 @@
 export default {
   mounted() {
     this.$refs.popup.style.opacity = '0';
+    this.$refs.popup.style.transform = 'translate(-50%, 100%)';
   },
 };
 </script>
@@ -26,7 +27,7 @@ export default {
   height: 100%;
   box-sizing: border-box;
   transform: translate(-50%, 100%);
-  background-color: rgba(169, 169, 169, 0.909);
+  background-color: rgba(82, 200, 135, 0.875);
   color: rgb(0, 0, 0);
   padding: 20px;
   border-radius: 10px;
