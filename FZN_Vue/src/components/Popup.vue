@@ -1,66 +1,82 @@
 <template>
   <div class="popup" ref="popup" @mousedown="startDrag" @touchstart="startDrag">
-    <div class="text-3xl text-">Event</div>
-    <div class="text-lg">Adress</div>
-    <div class="text-lg">Distance</div>
-    <div class="text-xl">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</div>
+    
+    <div class="text-3xl pt-5">Event name</div>
+
+    <div class="flex flex-row items-center justify-start">
+      <div class="pi pi-map-marker pr-3 "></div>
+      <div class="text-base">Adress</div>
+    </div>
+    
+    <div class="flex flex-row items-center justify-start">
+      <div class="pi pi-map  pr-3 text"></div>
+      <div class="text-base">Distance</div>
+    </div>
+
+    <TextBox></TextBox>
+
+    
+
+    <div class="text-xl text-transparent">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</div>
 
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      startX: 0,
-      startY: 0,
-      currentX: 0,
-      currentY: 0,
-      isDragging: false,
-    };
-  },
-  mounted() {
-    this.$refs.popup.style.opacity = '0';
-    this.$refs.popup.style.transform = 'translate(-50%, 100%)';
-  },
-  methods: {
-    startDrag(event) {
-      this.isDragging = true;
-      this.startX = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
-      this.startY = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
-      document.addEventListener('mousemove', this.onDrag);
-      document.addEventListener('touchmove', this.onDrag);
-      document.addEventListener('mouseup', this.endDrag);
-      document.addEventListener('touchend', this.endDrag);
-    },
-    onDrag(event) {
-      if (!this.isDragging) return;
-      this.currentX = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
-      this.currentY = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
-      const deltaX = this.currentX - this.startX;
-      const deltaY = this.currentY - this.startY;
-      if (deltaY > 5 && this.$refs.popup.scrollTop === 0) {
-        this.hidePopup();
-      } else {
-        this.$refs.popup.scrollTop -= deltaY;
-        this.$refs.popup.scrollLeft -= deltaX;
-      }
-      this.startX = this.currentX;
-      this.startY = this.currentY;
-    },
-    endDrag() {
-      this.isDragging = false;
-      document.removeEventListener('mousemove', this.onDrag);
-      document.removeEventListener('touchmove', this.onDrag);
-      document.removeEventListener('mouseup', this.endDrag);
-      document.removeEventListener('touchend', this.endDrag);
-    },
-    hidePopup() {
-      this.$refs.popup.style.transform = 'translate(-50%, 100%)';
-      this.$refs.popup.style.opacity = '0';
-    },
-  },
+<script setup>
+import { ref, onMounted } from 'vue';
+import TextBox from './TextBox.vue';
+
+const startX = ref(0);
+const startY = ref(0);
+const currentX = ref(0);
+const currentY = ref(0);
+const isDragging = ref(false);
+
+const popup = ref(null);
+
+const startDrag = (event) => {
+  isDragging.value = true;
+  startX.value = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
+  startY.value = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('touchmove', onDrag);
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchend', endDrag);
 };
+
+const onDrag = (event) => {
+  if (!isDragging.value) return;
+  currentX.value = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
+  currentY.value = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
+  const deltaX = currentX.value - startX.value;
+  const deltaY = currentY.value - startY.value;
+  if (deltaY > 5 && popup.value.scrollTop === 0) {
+    hidePopup();
+  } else {
+    popup.value.scrollTop -= deltaY;
+    popup.value.scrollLeft -= deltaX;
+  }
+  startX.value = currentX.value;
+  startY.value = currentY.value;
+};
+
+const endDrag = () => {
+  isDragging.value = false;
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('touchmove', onDrag);
+  document.removeEventListener('mouseup', endDrag);
+  document.removeEventListener('touchend', endDrag);
+};
+
+const hidePopup = () => {
+  popup.value.style.transform = 'translate(-50%, 100%)';
+  popup.value.style.opacity = '0';
+};
+
+onMounted(() => {
+  popup.value.style.opacity = '0';
+  popup.value.style.transform = 'translate(-50%, 100%)';
+});
 </script>
 
 <style scoped>
@@ -68,7 +84,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: top;
-  align-items: center;
+  
   position: absolute;
   overflow: auto;
   top: 50%;

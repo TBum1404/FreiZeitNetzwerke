@@ -8,6 +8,8 @@
       @touchstart="startDrag"
     >
       Karte 1
+
+      
     </div>
 
     <!-- Popup-Komponente -->
@@ -21,115 +23,116 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import Popup from './Popup.vue';
 
-export default {
-  components: {
-    Popup,
-  },
-  mounted() {
-    
-  },
-  beforeDestroy() {
-   
-  },
-  data() {
-    return {
-      startX: 0,
-      startY: 0,
-      currentX: 0,
-      currentY: 0,
-      isDragging: false,
-      hasDragged: false,
-      isPopupVisible: false,
-      
-    };
-  },
-  methods: {
-    showPopup() {
-    if (!this.$refs.popup) {
-      console.error("Popup reference not found!");
-      return;
-    }
-    console.log("Popup reference found:", this.$refs.popup);
-    this.$nextTick(() => {
-      this.$refs.popup.$el.style.transform = 'translate(-50%, -50%)';
-      this.$refs.popup.$el.style.opacity = '1';
-      console.log("Popup styles applied:", this.$refs.popup.$el.style.transform, this.$refs.popup.$el.style.opacity);
-      this.isPopupVisible = true;
-    });
-  },
-    hidePopup() {
-      if (!this.$refs.popup) {
-        console.error("Popup reference not found!");
-        return;
-      }
-      this.$refs.popup.$el.style.transform = 'translate(-50%, 100%)';
-      this.$refs.popup.$el.style.opacity = '0';
-      this.isPopupVisible = false;
-    },
-    togglePopup() {
-      if (this.isPopupVisible) {
-        this.hidePopup();
-      } else {
-        this.showPopup();
-      }
-    },
-    handleClick(event) {
-      if (!this.$refs.popup.$el.contains(event.target)) {
-        this.hidePopup();
-      }
-    },
-    startDrag(event) {
-      this.isDragging = true;
-      this.hasDragged = false;
-      this.startX = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
-      this.startY = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
-      document.addEventListener('mousemove', this.onDrag);
-      document.addEventListener('touchmove', this.onDrag);
-      document.addEventListener('mouseup', this.endDrag);
-      document.addEventListener('touchend', this.endDrag);
-    },
-    onDrag(event) {
-      if (!this.isDragging) return;
-      this.hasDragged = true;
-      this.currentX = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
-      this.currentY = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
-      const deltaX = this.currentX - this.startX;
-      const deltaY = this.currentY - this.startY;
-      const angle = deltaX / 10; // Adjust the divisor to control the angle
-      this.$refs.card.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${angle}deg)`;
-    },
-    endDrag() {
-      this.isDragging = false;
-      const deltaX = this.currentX - this.startX;
-      const deltaY = this.currentY - this.startY;
-      if (this.hasDragged && Math.abs(deltaX) > 100) {
-        // Swipe left or right with angle
-        const angle = deltaX / 10; 
-        this.$refs.card.style.transform = `translate(${deltaX > 0 ? '100%' : '-100%'}, 0) rotate(${angle}deg)`;
-        this.$refs.card.style.opacity = '0';
-      } else if (this.hasDragged && deltaY < -100) {
-        // Swipe up
-        this.showPopup();
-        this.resetCard();
-      } else {
-        // Reset position
-        this.$refs.card.style.transform = 'translate(0, 0) rotate(0deg)';
-      }
-      document.removeEventListener('mousemove', this.onDrag);
-      document.removeEventListener('touchmove', this.onDrag);
-      document.removeEventListener('mouseup', this.endDrag);
-      document.removeEventListener('touchend', this.endDrag);
-    },
-    resetCard() {
-      this.$refs.card.style.transform = 'translate(0, 0) rotate(0deg)';
-      this.$refs.card.style.opacity = '1';
-    },
-    
-  },
+const startX = ref(0);
+const startY = ref(0);
+const currentX = ref(0);
+const currentY = ref(0);
+const isDragging = ref(false);
+const hasDragged = ref(false);
+const isPopupVisible = ref(false);
+
+const card = ref(null);
+const popup = ref(null);
+
+const showPopup = () => {
+  if (!popup.value) {
+    console.error("Popup reference not found!");
+    return;
+  }
+  console.log("Popup reference found:", popup.value);
+  nextTick(() => {
+    popup.value.$el.style.transform = 'translate(-50%, -50%)';
+    popup.value.$el.style.opacity = '1';
+    console.log("Popup styles applied:", popup.value.$el.style.transform, popup.value.$el.style.opacity);
+    isPopupVisible.value = true;
+  });
 };
+
+const hidePopup = () => {
+  if (!popup.value) {
+    console.error("Popup reference not found!");
+    return;
+  }
+  popup.value.$el.style.transform = 'translate(-50%, 100%)';
+  popup.value.$el.style.opacity = '0';
+  isPopupVisible.value = false;
+};
+
+const togglePopup = () => {
+  if (isPopupVisible.value) {
+    hidePopup();
+  } else {
+    showPopup();
+  }
+};
+
+const handleClick = (event) => {
+  if (!popup.value.$el.contains(event.target)) {
+    hidePopup();
+  }
+};
+
+const startDrag = (event) => {
+  isDragging.value = true;
+  hasDragged.value = false;
+  startX.value = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
+  startY.value = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('touchmove', onDrag);
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchend', endDrag);
+};
+
+const onDrag = (event) => {
+  if (!isDragging.value) return;
+  hasDragged.value = true;
+  currentX.value = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
+  currentY.value = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
+  const deltaX = currentX.value - startX.value;
+  const deltaY = currentY.value - startY.value;
+  const angle = deltaX / 10; // Adjust the divisor to control the angle
+  card.value.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${angle}deg)`;
+};
+
+const endDrag = () => {
+  isDragging.value = false;
+  const deltaX = currentX.value - startX.value;
+  const deltaY = currentY.value - startY.value;
+  if (hasDragged.value && Math.abs(deltaX) > 100) {
+    // Swipe left or right with angle
+    const angle = deltaX / 10; 
+    card.value.style.transform = `translate(${deltaX > 0 ? '100%' : '-100%'}, 0) rotate(${angle}deg)`;
+    card.value.style.opacity = '0';
+  } else if (hasDragged.value && deltaY < -100) {
+    // Swipe up
+    showPopup();
+    resetCard();
+  } else {
+    // Reset position
+    card.value.style.transform = 'translate(0, 0) rotate(0deg)';
+  }
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('touchmove', onDrag);
+  document.removeEventListener('mouseup', endDrag);
+  document.removeEventListener('touchend', endDrag);
+};
+
+const resetCard = () => {
+  card.value.style.transform = 'translate(0, 0) rotate(0deg)';
+  card.value.style.opacity = '1';
+};
+
+onMounted(() => {
+  // Add any necessary mounted logic here
+});
+
+onBeforeUnmount(() => {
+  // Add any necessary before destroy logic here
+});
 </script>
 
 <style scoped>
