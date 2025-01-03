@@ -42,8 +42,7 @@ import TitleCaption from '@/components/TitleCaption.vue';
   flex-direction: row;
   justify-content: center;
   position:relative;
-  width: 100%;
-  height: 100%;
+  
   height:auto;
   
   /* background-color: rgb(137, 50, 50); */

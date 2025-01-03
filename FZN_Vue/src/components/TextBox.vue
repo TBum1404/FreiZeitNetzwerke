@@ -24,7 +24,7 @@
 
         <div class="text-base font-bold ">{{ title }}</div>
 
-        <div class="text-base text-black text-sm" > {{ content }} </div>
+        <div class=" text-black text-sm" > {{ content }} </div>
 
     </div>
 

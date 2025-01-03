@@ -91,7 +91,7 @@ onMounted(() => {
   top: 50%;
   left: 50%;
   width: 300px;
-  height: 400px;
+  height: 500px;
   box-sizing: border-box;
   transform: translate(-50%, 100%);
   background-color: rgba(227, 227, 227, 0.95);

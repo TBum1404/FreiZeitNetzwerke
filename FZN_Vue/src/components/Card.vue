@@ -1,28 +1,3 @@
-<template>
-  <div class="container" >
-    <!-- Eine einzelne Karte -->
-    <div
-      class="card"
-      ref="card"
-      @mousedown="startDrag"
-      @touchstart="startDrag"
-    >
-      Karte 1
-
-      
-    </div>
-
-    <!-- Popup-Komponente -->
-    <Popup ref="popup"  />
-
-    <!-- Toggle Popup Button -->
-    <button id="togglePopupButton" @click="togglePopup">Toggle Popup</button>
-
-    <!-- Undo-Button -->
-    <button id="undoButton" @click="resetCard">Karte zurücksetzen</button>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import Popup from './Popup.vue';
@@ -135,34 +110,131 @@ onBeforeUnmount(() => {
 });
 </script>
 
+<template>
+  <div class="container" >
+    <!-- Eine einzelne Karte -->
+    <div class="card"ref="card" @mousedown="startDrag" @touchstart="startDrag">
+      
+      <div class="gradient">
+          <div class="text-3xl pt-10 px-5">Eventname</div>
+          
+          <div class="flex flex-row items-center justify-start">
+              <div class="pi pi-map-marker pr-3 pl-5 text-lg"></div>
+              <div class="text-base">Adress</div>
+          </div>
+    
+          <div class="flex flex-row items-center justify-start">
+            <div class="pi pi-map  pr-3 text pl-5 text-lg"></div>
+            <div class="text-base">Distance</div>
+          </div>
+      </div>
+
+      <div class="banner">
+        <div class="text-base">
+          Text
+        </div>
+
+        <div class="text-base">
+          Text2
+        </div>
+
+
+        <div class="text-base">
+          Text3
+        </div>
+
+      </div>
+      
+    </div>
+
+    <!-- Popup-Komponente -->
+    <Popup ref="popup"  />
+
+    <!-- Toggle Popup Button -->
+    <button id="togglePopupButton" @click="togglePopup">Toggle Popup</button>
+
+    <!-- Undo-Button -->
+    <button id="undoButton" @click="resetCard">Karte zurücksetzen</button>
+  </div>
+</template>
+
+
 <style scoped>
 /* Container-Stile */
-.container {
-  position: relative;
+
+.gradient{
+  
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(255, 0, 0, 0));
+  width: 100%;
+  height: 45%;
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
+
+
+  color: #AACC00;
+
+}
+
+.banner{
+  background: #FFFFFF;
+  
+  width: 80%;
+  height: 4rem;
+  margin-bottom: 10%;
+  
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items:center;
+
+  padding-left: 10px;
+  padding-right: 10px;;
+  
+}
+
+.container {
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
   width: 300px;
-  height: 500px;
-  margin: auto;
+  height: 600px;
+ 
 }
 
 /* Karten-Stile */
 .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #ffffff;
+  background-image: url('../assets/images/Bouldering.jpg');
+  background-size: cover;
+  background-position: center;
+
   width: 300px;
-  height: 400px;
+  height: 500px;
   position: absolute;
   
-  background: #ffffff;
+  
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: center;
-  align-items: center;
+ 
   font-size: 24px;
   cursor: grab;
   user-select: none;
   transition: transform 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
 }
 
 /* Popup-Stile */
