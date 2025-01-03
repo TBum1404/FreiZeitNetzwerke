@@ -142,7 +142,7 @@ onBeforeUnmount(() => {
         <div class="text-base">
           Text3
         </div>
-
+        <div class="pi pi-info-circle pr-3m text-green-700"></div>
       </div>
       
     </div>
