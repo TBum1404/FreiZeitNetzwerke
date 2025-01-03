@@ -130,19 +130,24 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="banner">
-        <div class="text-base">
-          Text
+        <div class="text-base content-center flex flex-row  items-center">
+          <div>Text</div>
+
+          <div class="text-base  content-center px-5">
+            <div class="flex flex-col items-center text-green-700">
+              <div class="text-sm font-bold">Name</div>
+              <div class="text-sm ">Info | Info | Info</div>
+            </div>
+          </div>
         </div>
 
-        <div class="text-base">
-          Text2
-        </div>
+        
 
 
-        <div class="text-base">
+        <div class="text-base content-center">
           Text3
         </div>
-        <div class="pi pi-info-circle pr-3m text-green-700"></div>
+        <div class="pi pi-info-circle text-green-700 text-lg pt-2"></div>
       </div>
       
     </div>
@@ -189,7 +194,9 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items:center;
+
+  
+  
 
   padding-left: 10px;
   padding-right: 10px;;

@@ -51,13 +51,15 @@
     background-color: #6b86bc;
 
     width:300px;
-    height: 130px;
+    height: 150px;
+
+    padding-bottom: 10px;
 
     border-radius: 10px;
 
-    margin:10px;
+    margin:5px;
 
-    color: #007F5F;
+    color: #AACC00;
 
     background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.4)),url('../assets/images/Bouldering.jpg');
     background-size: cover;

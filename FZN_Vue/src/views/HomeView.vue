@@ -41,7 +41,8 @@ import CardMini from '@/components/CardMini.vue';
     
 
     <div class="flex flex-col justify-center items-center w-1/2  bg-green-200">
-      <div class="">
+      <div class="scrollEvents">
+        <CardMini />
         <CardMini />
         <CardMini />
         <CardMini />
@@ -73,5 +74,13 @@ import CardMini from '@/components/CardMini.vue';
   height:auto;
   
   /* background-color: rgb(137, 50, 50); */
+}
+
+.scrollEvents{
+  display:flex;
+  flex-direction: column;
+  height:400px;
+
+  overflow-y: scroll;
 }
 </style>
