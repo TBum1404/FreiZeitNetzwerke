@@ -13,6 +13,7 @@
       <div class="text-base">Distance</div>
     </div>
 
+    <TextBox title="Changed the default"></TextBox>
     <TextBox></TextBox>
 
     

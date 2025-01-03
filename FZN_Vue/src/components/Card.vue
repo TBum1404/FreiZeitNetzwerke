@@ -170,8 +170,8 @@ onBeforeUnmount(() => {
 /* Toggle Popup Button */
 #togglePopupButton {
   position: fixed;
-  top: 0;
-  right: 0;
+  top: 150px;
+  right: 50px;
   padding: 10px 20px;
   font-size: 16px;
   background-color: #28a745;

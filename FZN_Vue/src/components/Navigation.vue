@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
-import logo from '../../public/favicon.ico';
+import logo from '../../public/Logo.png';
 
 const isActiveLink = (routePath) => {
   const route = useRoute();
@@ -19,7 +19,7 @@ const isActiveLink = (routePath) => {
           <RouterLink class="flex flex-shrink-0 items-center mr-4" to="/">
             <img class="h-10 w-auto" :src="logo" alt="Vue Jobs" />
             <span class="hidden md:block text-white text-2xl font-bold ml-2"
-              >Vue Jobs</span
+              >FreiZeitNetzwerke</span
             >
           </RouterLink>
           <div class="md:ml-auto">
@@ -35,7 +35,7 @@ const isActiveLink = (routePath) => {
                   'py-2',
                   'rounded-md',
                 ]"
-                >Home</RouterLink
+                >Presentation</RouterLink
               >
               <RouterLink
                 to="/jobs"
